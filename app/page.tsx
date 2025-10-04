@@ -1,153 +1,118 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { questions } from "./data/questions";
 
-const questions = [
-  {
-    question: "Apa singkatan token utama di ekosistem Rialo?",
-    options: ["RLO", "RIALO", "RLT", "RLD"],
-    answer: "RLO",
-  },
-  {
-    question: "Rialo terutama berfokus pada apa?",
-    options: ["Gaming", "Blockchain Ecosystem", "Social Media", "Streaming"],
-    answer: "Blockchain Ecosystem",
-  },
-  {
-    question: "Siapa yang dapat berkontribusi di Rialo?",
-    options: ["Hanya developer", "Hanya investor", "Komunitas secara luas", "Tidak ada"],
-    answer: "Komunitas secara luas",
-  },
-];
-
-export default function Home() {
+export default function QuizPage() {
   const [current, setCurrent] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
-  const [finished, setFinished] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [timeLeft, setTimeLeft] = useState(15);
+  const [showResult, setShowResult] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(15); // timer per soal
 
-  // Timer countdown
   useEffect(() => {
-    if (finished) return;
+    if (showResult) return; // stop timer kalau sudah selesai
     if (timeLeft <= 0) {
-      handleAnswer(null);
+      handleNext();
       return;
     }
     const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(timer);
-  }, [timeLeft, finished]);
+  }, [timeLeft, showResult]);
 
-  const handleAnswer = (option: string | null) => {
-    if (selected) return;
-    setSelected(option ?? "");
-
-    if (option === questions[current].answer) {
-      setScore((s) => s + 1);
+  const handleAnswer = (index: number) => {
+    if (selected !== null) return; // biar gak bisa pilih lebih dari sekali
+    setSelected(index);
+    if (index === questions[current].answer) {
+      setScore((prev) => prev + 1);
     }
-
-    setTimeout(() => {
-      if (current + 1 < questions.length) {
-        setCurrent((c) => c + 1);
-        setSelected(null);
-        setTimeLeft(15);
-      } else {
-        setFinished(true);
-      }
-    }, 1200);
+    setTimeout(() => handleNext(), 1200); // delay sebelum lanjut
   };
 
-  const restart = () => {
+  const handleNext = () => {
+    if (current + 1 < questions.length) {
+      setCurrent((prev) => prev + 1);
+      setSelected(null);
+      setTimeLeft(15);
+    } else {
+      setShowResult(true);
+    }
+  };
+
+  const handleRestart = () => {
     setCurrent(0);
-    setScore(0);
-    setFinished(false);
     setSelected(null);
+    setScore(0);
+    setShowResult(false);
     setTimeLeft(15);
   };
 
+  if (showResult) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-6">
+        <h1 className="text-2xl font-bold mb-4">Quiz Finished 🎉</h1>
+        <p className="text-lg mb-6">
+          Your Score: {score} / {questions.length}
+        </p>
+        <button
+          onClick={handleRestart}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Restart Quiz 🔄
+        </button>
+      </div>
+    );
+  }
+
+  const q = questions[current];
+  const progress = ((current + 1) / questions.length) * 100;
+
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-600 p-6">
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-xl bg-white rounded-2xl shadow-xl p-8"
-      >
-        <h1 className="text-3xl font-extrabold text-center mb-6 text-gray-800">
-          🎮 Rialo Quiz
-        </h1>
+    <div className="flex flex-col items-center justify-center min-h-screen p-6 w-full">
+      {/* Progress bar */}
+      <div className="w-full max-w-lg mb-6">
+        <div className="w-full h-3 bg-gray-200 rounded-full">
+          <div
+            className="h-3 bg-blue-500 rounded-full transition-all duration-500"
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+        <p className="text-sm text-gray-600 mt-1 text-center">
+          Question {current + 1} of {questions.length}
+        </p>
+      </div>
 
-        <AnimatePresence mode="wait">
-          {!finished ? (
-            <motion.div
-              key={current}
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -100, opacity: 0 }}
-              transition={{ duration: 0.4 }}
+      <p className="mb-6 text-center font-medium">{q.question}</p>
+
+      <div className="grid grid-cols-1 gap-3 w-full max-w-lg">
+        {q.options.map((opt, idx) => {
+          let className =
+            "p-3 border rounded-lg cursor-pointer transition-colors";
+          if (selected !== null) {
+            if (idx === q.answer) {
+              className += " bg-green-300 border-green-500";
+            } else if (idx === selected && selected !== q.answer) {
+              className += " bg-red-300 border-red-500";
+            } else {
+              className += " bg-gray-100";
+            }
+          } else {
+            className += " hover:bg-blue-100";
+          }
+          return (
+            <button
+              key={idx}
+              className={className}
+              onClick={() => handleAnswer(idx)}
+              disabled={selected !== null}
             >
-              <div className="flex justify-between mb-4">
-                <p className="text-sm text-gray-600">
-                  Pertanyaan {current + 1} dari {questions.length}
-                </p>
-                <p className="font-semibold text-red-500">⏳ {timeLeft}s</p>
-              </div>
+              {opt}
+            </button>
+          );
+        })}
+      </div>
 
-              <h2 className="text-lg font-semibold mb-6">{questions[current].question}</h2>
-
-              <div className="grid gap-3">
-                {questions[current].options.map((opt, idx) => {
-                  const isCorrect = selected && opt === questions[current].answer;
-                  const isWrong =
-                    selected && selected === opt && opt !== questions[current].answer;
-
-                  return (
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      key={idx}
-                      onClick={() => handleAnswer(opt)}
-                      disabled={!!selected}
-                      className={`px-4 py-3 rounded-lg border text-left font-medium transition-colors
-                        ${!selected ? "bg-blue-500 text-white hover:bg-blue-600" : ""}
-                        ${isCorrect ? "bg-green-500 text-white border-green-700" : ""}
-                        ${isWrong ? "bg-red-500 text-white border-red-700" : ""}
-                        ${selected && !isCorrect && !isWrong ? "bg-gray-200 text-gray-600" : ""}
-                      `}
-                    >
-                      {opt}
-                    </motion.button>
-                  );
-                })}
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="result"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center"
-            >
-              <h2 className="text-2xl font-bold mb-4">🎉 Quiz Selesai!</h2>
-              <p className="text-lg mb-6">
-                Skor kamu:{" "}
-                <span className="font-extrabold text-blue-600">{score}</span> /{" "}
-                {questions.length}
-              </p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={restart}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg shadow hover:bg-green-700"
-              >
-                Main Lagi 🔄
-              </motion.button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    </main>
+      <div className="mt-6 text-lg font-bold">⏳ {timeLeft}s</div>
+    </div>
   );
 }
