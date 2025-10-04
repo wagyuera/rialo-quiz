@@ -1,23 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { questions } from "./data/questions";
 
-/* BackgroundWrapper: didefinisikan di luar komponen utama agar tidak
-   dibuat ulang setiap render (mencegah unmount/remount anak). */
 function BackgroundWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen p-6 text-white">
-      <Image
-        src="/bg.jpg"
-        alt="Background"
-        fill
-        priority
-        className="object-cover blur-sm pointer-events-none"
-      />
-      <div className="absolute inset-0 bg-black/50 pointer-events-none" />
-      <div className="relative z-10 w-full flex flex-col items-center">{children}</div>
+    <div className="relative flex flex-col items-center justify-center min-h-screen p-6 text-white bg-gradient-to-br from-[#fdfcf7] to-[#000000]">
+      <div className="relative z-10 w-full flex flex-col items-center">
+        {children}
+      </div>
     </div>
   );
 }
@@ -78,7 +69,6 @@ export default function QuizPage() {
   if (!submitted) {
     return (
       <BackgroundWrapper>
-        <Image src="/rialo-logo.png" alt="Rialo Logo" width={80} height={80} className="mb-4" />
         <h1 className="text-3xl font-extrabold mb-6">Rialo Knowledge Game</h1>
         <p className="mb-4 text-lg">Enter your username to start:</p>
 
@@ -108,7 +98,6 @@ export default function QuizPage() {
   if (showResult) {
     return (
       <BackgroundWrapper>
-        <Image src="/rialo-logo.png" alt="Rialo Logo" width={80} height={80} className="mb-4" />
         <h1 className="text-3xl font-extrabold mb-2">Rialo Knowledge Game 🎉</h1>
         <p className="text-lg mb-2">
           Player: <span className="font-bold">{username}</span>
@@ -129,7 +118,6 @@ export default function QuizPage() {
   // Halaman quiz
   return (
     <BackgroundWrapper>
-      <Image src="/rialo-logo.png" alt="Rialo Logo" width={80} height={80} className="mb-3" />
       <h1 className="text-3xl font-extrabold mb-6">Rialo Knowledge Game</h1>
 
       {/* Progress bar */}
@@ -162,7 +150,12 @@ export default function QuizPage() {
             className += " bg-white text-black hover:bg-yellow-200";
           }
           return (
-            <button key={idx} className={className} onClick={() => handleAnswer(idx)} disabled={selected !== null}>
+            <button
+              key={idx}
+              className={className}
+              onClick={() => handleAnswer(idx)}
+              disabled={selected !== null}
+            >
               {opt}
             </button>
           );
