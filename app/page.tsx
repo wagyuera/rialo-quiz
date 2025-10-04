@@ -55,27 +55,22 @@ export default function QuizPage() {
   const progress = ((current + 1) / questions.length) * 100;
   const q = questions[current];
 
-  // Wrapper dengan background image
   const BackgroundWrapper = ({ children }: { children: React.ReactNode }) => (
     <div className="relative flex flex-col items-center justify-center min-h-screen p-6 text-white">
-      {/* Background Image */}
       <Image
         src="/bg.jpg"
         alt="Background"
         fill
         priority
-        className="object-cover blur-sm"
+        className="object-cover blur-sm pointer-events-none"
       />
-      {/* Overlay gelap */}
-      <div className="absolute inset-0 bg-black/50" />
-      {/* Konten */}
+      <div className="absolute inset-0 bg-black/50 pointer-events-none" />
       <div className="relative z-10 w-full flex flex-col items-center">
         {children}
       </div>
     </div>
   );
 
-  // Halaman input username
   if (!submitted) {
     return (
       <BackgroundWrapper>
@@ -86,7 +81,7 @@ export default function QuizPage() {
           height={80}
           className="mb-4"
         />
-        <h1 className="text-3xl font-extrabold mb-6">RIALO QUIZ GAME</h1>
+        <h1 className="text-3xl font-extrabold mb-6">Rialo Knowledge Game</h1>
         <p className="mb-4 text-lg">Enter your username to start:</p>
         <input
           type="text"
@@ -105,7 +100,6 @@ export default function QuizPage() {
     );
   }
 
-  // Halaman hasil
   if (showResult) {
     return (
       <BackgroundWrapper>
@@ -116,7 +110,7 @@ export default function QuizPage() {
           height={80}
           className="mb-4"
         />
-        <h1 className="text-3xl font-extrabold mb-2">RIALO QUIZ GAME 🎉</h1>
+        <h1 className="text-3xl font-extrabold mb-2">Rialo Knowledge Game 🎉</h1>
         <p className="text-lg mb-2">
           Player: <span className="font-bold">{username}</span>
         </p>
@@ -127,13 +121,12 @@ export default function QuizPage() {
           onClick={handleRestart}
           className="px-4 py-2 bg-yellow-500 text-black rounded-lg hover:bg-yellow-400 transition-colors"
         >
-          Restart Quiz 🔄
+          Restart Game 🔄
         </button>
       </BackgroundWrapper>
     );
   }
 
-  // Halaman quiz
   return (
     <BackgroundWrapper>
       <Image
@@ -143,9 +136,8 @@ export default function QuizPage() {
         height={80}
         className="mb-3"
       />
-      <h1 className="text-3xl font-extrabold mb-6">RIALO QUIZ GAME</h1>
+      <h1 className="text-3xl font-extrabold mb-6">Rialo Knowledge Game</h1>
 
-      {/* Progress bar */}
       <div className="w-full max-w-lg mb-6">
         <div className="w-full h-3 bg-gray-700 rounded-full">
           <div
