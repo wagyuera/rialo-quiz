@@ -5,8 +5,8 @@ import Image from "next/image";
 import { questions } from "./data/questions";
 
 export default function QuizPage() {
-  const [username, setUsername] = useState(""); // simpan username
-  const [submitted, setSubmitted] = useState(false); // apakah username sudah dimasukkan
+  const [username, setUsername] = useState("");
+  const [submitted, setSubmitted] = useState(false);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
@@ -48,17 +48,37 @@ export default function QuizPage() {
     setScore(0);
     setShowResult(false);
     setTimeLeft(15);
-    setSubmitted(false); // kembali ke halaman input username
+    setSubmitted(false);
     setUsername("");
   };
 
   const progress = ((current + 1) / questions.length) * 100;
   const q = questions[current];
 
+  // Wrapper dengan background image
+  const BackgroundWrapper = ({ children }: { children: React.ReactNode }) => (
+    <div className="relative flex flex-col items-center justify-center min-h-screen p-6 text-white">
+      {/* Background Image */}
+      <Image
+        src="/bg.jpg"
+        alt="Background"
+        fill
+        priority
+        className="object-cover blur-sm"
+      />
+      {/* Overlay gelap */}
+      <div className="absolute inset-0 bg-black/50" />
+      {/* Konten */}
+      <div className="relative z-10 w-full flex flex-col items-center">
+        {children}
+      </div>
+    </div>
+  );
+
   // Halaman input username
   if (!submitted) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-gradient-to-br from-blue-900 via-indigo-800 to-purple-900 text-white">
+      <BackgroundWrapper>
         <Image
           src="/rialo-logo.png"
           alt="Rialo Logo"
@@ -81,14 +101,14 @@ export default function QuizPage() {
         >
           Start Quiz 🚀
         </button>
-      </div>
+      </BackgroundWrapper>
     );
   }
 
   // Halaman hasil
   if (showResult) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-gradient-to-br from-blue-900 via-indigo-800 to-purple-900 text-white">
+      <BackgroundWrapper>
         <Image
           src="/rialo-logo.png"
           alt="Rialo Logo"
@@ -97,7 +117,9 @@ export default function QuizPage() {
           className="mb-4"
         />
         <h1 className="text-3xl font-extrabold mb-2">RIALO QUIZ GAME 🎉</h1>
-        <p className="text-lg mb-2">Player: <span className="font-bold">{username}</span></p>
+        <p className="text-lg mb-2">
+          Player: <span className="font-bold">{username}</span>
+        </p>
         <p className="text-lg mb-6">
           Your Score: {score} / {questions.length}
         </p>
@@ -107,14 +129,13 @@ export default function QuizPage() {
         >
           Restart Quiz 🔄
         </button>
-      </div>
+      </BackgroundWrapper>
     );
   }
 
   // Halaman quiz
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-gradient-to-br from-blue-900 via-indigo-800 to-purple-900 text-white">
-      {/* Logo & Title */}
+    <BackgroundWrapper>
       <Image
         src="/rialo-logo.png"
         alt="Rialo Logo"
@@ -168,6 +189,6 @@ export default function QuizPage() {
       </div>
 
       <div className="mt-6 text-lg font-bold">⏳ {timeLeft}s</div>
-    </div>
+    </BackgroundWrapper>
   );
 }
